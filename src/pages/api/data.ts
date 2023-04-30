@@ -26,7 +26,6 @@ const initialDeck = [
 
 export const initialState: Game = {
   deck: initialDeck,
-  currentCardIndex: 0,
   currentTeam: "teamName1",
   round: 1,
   savedCards: [],

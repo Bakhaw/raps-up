@@ -10,33 +10,44 @@ function Home() {
   const [currentGame, setCurrentGame] = useState(initialState);
   const [counter, setCounter] = useState(initialCounter);
 
-  const isLastCard = currentGame.currentCardIndex === currentGame.deck.length;
+  const isDeckEnd = currentGame.deck.length === 0;
+  const activeCard = currentGame.deck[0];
 
   function skipCard() {
-    if (isLastCard || counter === 0) return;
+    if (isDeckEnd || counter === 0) return;
 
-    setCurrentGame((currentGame) => ({
-      ...currentGame,
-      currentCardIndex: currentGame.currentCardIndex + 1,
-    }));
+    setCurrentGame((currentGame) => {
+      const [currentCard, ...restCards] = currentGame.deck;
+      const newDeck = [...restCards, currentCard];
+
+      return {
+        ...currentGame,
+        deck: newDeck,
+      };
+    });
   }
 
   function saveCard() {
-    if (isLastCard || counter === 0) return;
+    if (isDeckEnd || counter === 0) return;
 
-    setCurrentGame((currentGame) => ({
-      ...currentGame,
-      currentCardIndex: currentGame.currentCardIndex + 1,
-      savedCards: [
-        ...currentGame.savedCards,
-        currentGame.deck[currentGame.currentCardIndex],
-      ],
-      scoreboard: {
+    setCurrentGame((currentGame) => {
+      const newDeck = currentGame.deck.filter(
+        (item) => item.chunks[0] !== activeCard.chunks[0]
+      );
+      const newSavedCards = [...currentGame.savedCards, activeCard];
+      const newScoreboard = {
         ...currentGame.scoreboard,
         [currentGame.currentTeam]:
           currentGame.scoreboard[currentGame.currentTeam] + 1,
-      },
-    }));
+      };
+
+      return {
+        ...currentGame,
+        deck: newDeck,
+        savedCards: newSavedCards,
+        scoreboard: newScoreboard,
+      };
+    });
   }
 
   function goToNextLevel() {
@@ -73,7 +84,7 @@ function Home() {
     return () => clearInterval(interval);
   }, [counter]);
 
-  const cardsLeft = currentGame.deck.length - currentGame.currentCardIndex;
+  const cardsLeft = currentGame.deck.length;
 
   console.log(currentGame);
 
@@ -98,7 +109,6 @@ function Home() {
           </div>
 
           <h1>{counter} secondes</h1>
-          <h1>Au tour de {currentGame.currentTeam}</h1>
         </div>
 
         <ul>
@@ -112,13 +122,16 @@ function Home() {
       </div>
 
       <div className="self-center">
-        {currentGame.currentCardIndex < currentGame.deck.length && (
-          <Card
-            chunks={currentGame.deck[currentGame.currentCardIndex].chunks}
-          />
-        )}
+        {isDeckEnd && <button onClick={goToNextLevel}>Manche suivante</button>}
 
-        {isLastCard && <button onClick={goToNextLevel}>Manche suivante</button>}
+        {!isDeckEnd && counter > 0 ? (
+          <Card chunks={activeCard.chunks} />
+        ) : (
+          <>
+            <h1>Au tour de {currentGame.currentTeam}</h1>
+            <button onClick={() => setCounter(initialCounter)}>Démarrer</button>
+          </>
+        )}
       </div>
     </main>
   );

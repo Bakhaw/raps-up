@@ -13,7 +13,6 @@ interface Score {
 
 export interface Game {
   deck: CardProps[];
-  currentCardIndex: number;
   currentTeam: Team["name"];
   nextTeams: Team["name"][];
   round: number;
