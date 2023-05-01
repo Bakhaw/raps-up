@@ -71,11 +71,14 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
     if (currentGame.savedCards.length === 0) return;
 
     setCurrentGame((currentGame) => {
+      const teams = currentGame.teams.map((team) => team.name);
+      const [activeTeam, ...restTeams] = teams;
+
       return {
         ...currentGame,
-        activeTeam: initialGame.activeTeam,
+        activeTeam: activeTeam,
         deck: currentGame.savedCards,
-        nextTeams: initialGame.nextTeams,
+        nextTeams: [...restTeams, activeTeam],
         round: currentGame.round + 1,
         savedCards: [],
       };

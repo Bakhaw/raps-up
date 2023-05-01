@@ -10,6 +10,9 @@ const clipPathPercentage = 30;
 const offset = (clipPathPercentage * cardHeight) / 100;
 
 const CardChunk: React.FC<CardChunkProps> = ({ chunk, rotate }) => {
+  const blue = "#0E7BBF";
+  const yellow = "#FFDD00";
+
   return (
     <div
       style={{
@@ -17,7 +20,7 @@ const CardChunk: React.FC<CardChunkProps> = ({ chunk, rotate }) => {
         width: cardWidth,
         maxWidth: 600,
         marginBottom: -(cardHeight - offset),
-        backgroundColor: rotate ? "blue" : "yellow",
+        backgroundColor: rotate ? blue : yellow,
         clipPath: `polygon(0 0, 100% 0, 100% ${clipPathPercentage}%, 0% 100%)`,
         ...(rotate && {
           transform: "rotate(180deg)",
@@ -39,7 +42,7 @@ const CardChunk: React.FC<CardChunkProps> = ({ chunk, rotate }) => {
             clipPath: "polygon(0 20%, 75% 0%, 100% 55%, 60% 100%, 0% 100%)",
           }}
         >
-          <div className="text-xl font-bold capitalize">{chunk}</div>
+          <div className="text-black text-xl font-bold capitalize">{chunk}</div>
         </div>
       </div>
     </div>
