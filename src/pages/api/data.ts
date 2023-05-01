@@ -24,9 +24,11 @@ const initialDeck = [
   },
 ];
 
-export const initialState: Game = {
+export const initialCounter = 5; // seconds
+
+export const initialGame: Game = {
+  activeTeam: "teamName1",
   deck: initialDeck,
-  currentTeam: "teamName1",
   round: 1,
   savedCards: [],
   scoreboard: {

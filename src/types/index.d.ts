@@ -12,8 +12,8 @@ interface Score {
 }
 
 export interface Game {
+  activeTeam: Team["name"];
   deck: CardProps[];
-  currentTeam: Team["name"];
   nextTeams: Team["name"][];
   round: number;
   savedCards: CardProps | null;
