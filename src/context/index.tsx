@@ -6,17 +6,24 @@ import { initialCounter, initialGame } from "@/pages/api/data";
 interface GameContextValue extends Game {
   counter: number;
   methods: {
-    goToNextRound?: () => void;
-    resetCounter?: () => void;
-    saveCard?: () => void;
-    skipCard?: () => void;
+    goToNextRound: () => void;
+    goToNextTurn: () => void;
+    resetCounter: () => void;
+    saveCard: () => void;
+    skipCard: () => void;
   };
 }
 
 export const GameContext = createContext<GameContextValue>({
   ...initialGame,
   counter: 0,
-  methods: {},
+  methods: {
+    goToNextRound: () => {},
+    goToNextTurn: () => {},
+    resetCounter: () => {},
+    saveCard: () => {},
+    skipCard: () => {},
+  },
 });
 
 interface ContextProviderProps {
@@ -28,10 +35,11 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
   const [counter, setCounter] = useState(initialCounter);
 
   const isDeckEnd = currentGame.deck.length === 0;
+  const isCounterEnd = counter === 0;
   const activeCard = currentGame.deck[0];
 
   function skipCard() {
-    if (isDeckEnd || counter === 0) return;
+    if (isDeckEnd || isCounterEnd) return;
 
     setCurrentGame((currentGame) => {
       const [currentCard, ...restCards] = currentGame.deck;
@@ -45,7 +53,7 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
   }
 
   function saveCard() {
-    if (isDeckEnd || counter === 0) return;
+    if (isDeckEnd || isCounterEnd) return;
 
     setCurrentGame((currentGame) => {
       const newDeck = currentGame.deck.filter(
@@ -54,8 +62,8 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
       const newSavedCards = [...currentGame.savedCards, activeCard];
       const newScoreboard = {
         ...currentGame.scoreboard,
-        [currentGame.activeTeam]:
-          currentGame.scoreboard[currentGame.activeTeam] + 1,
+        [currentGame.activeTeam.name]:
+          currentGame.scoreboard[currentGame.activeTeam.name] + 1,
       };
 
       return {
@@ -68,18 +76,20 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
   }
 
   function goToNextRound() {
-    if (currentGame.savedCards.length === 0) return;
+    // if (currentGame.savedCards.length === 0) return;
 
     setCurrentGame((currentGame) => {
-      const teams = currentGame.teams.map((team) => team.name);
-      const [activeTeam, ...restTeams] = teams;
+      const { round, savedCards, teams } = currentGame;
 
       return {
         ...currentGame,
-        activeTeam: activeTeam,
-        deck: currentGame.savedCards,
-        nextTeams: [...restTeams, activeTeam],
-        round: currentGame.round + 1,
+        activePlayer: teams[0].players[0],
+        activePlayerIndex: 0,
+        activeTeam: teams[0],
+        activeTeamIndex: 0,
+        activeTurn: 1,
+        deck: savedCards,
+        round: round + 1,
         savedCards: [],
       };
     });
@@ -91,31 +101,54 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
     setCounter(initialCounter);
   }
 
-  useEffect(() => {
-    if (counter === 0) {
-      return setCurrentGame((currentGame) => {
-        const [firstEl, ...rest] = currentGame.nextTeams;
+  function goToNextTurn() {
+    const { activePlayerIndex, activeTurn, teams } = currentGame;
+    // const isRoundEnd =
+    //   activePlayerIndex === teams.length && activeTurn === teams.length;
 
-        return {
-          ...currentGame,
-          activeTeam: firstEl,
-          nextTeams: [...rest, firstEl],
-        };
-      });
-    }
+    // if (isRoundEnd) return;
+
+    setCurrentGame((currentGame) => {
+      const { activePlayerIndex, activeTeamIndex, activeTurn, teams } =
+        currentGame;
+
+      // isTurnEnd is used to know if ALL teams has played a round
+      const isTurnEnd = activeTurn === teams.length;
+      const newActiveTeamIndex = isTurnEnd ? 0 : activeTeamIndex + 1;
+      const newActiveTeam = teams[newActiveTeamIndex];
+      const newActiveTurn = isTurnEnd ? 1 : activeTurn + 1;
+      const newActivePlayerIndex =
+        newActiveTurn === teams.length
+          ? activePlayerIndex + 1
+          : activePlayerIndex;
+
+      return {
+        ...currentGame,
+        activePlayer: newActiveTeam.players[activePlayerIndex],
+        activePlayerIndex: newActivePlayerIndex,
+        activeTeamIndex: newActiveTeamIndex,
+        activeTeam: newActiveTeam,
+        activeTurn: newActiveTurn,
+      };
+    });
+  }
+
+  useEffect(() => {
+    if (isCounterEnd) return;
 
     const interval = setInterval(() => {
       setCounter(counter - 1);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [counter]);
+  }, [counter, isCounterEnd]);
 
   const contextValue = {
     ...currentGame,
     counter,
     methods: {
       goToNextRound,
+      goToNextTurn,
       resetCounter,
       saveCard,
       skipCard,

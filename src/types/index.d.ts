@@ -12,9 +12,12 @@ interface Score {
 }
 
 export interface Game {
-  activeTeam: Team["name"];
+  activePlayer: Player;
+  activePlayerIndex: number;
+  activeTeam: Team;
+  activeTeamIndex: number;
+  activeTurn: number;
   deck: CardProps[];
-  nextTeams: Team["name"][];
   round: number;
   savedCards: CardProps | null;
   scoreboard: Score;

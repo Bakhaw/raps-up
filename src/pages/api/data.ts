@@ -24,10 +24,23 @@ const initialDeck = [
   },
 ];
 
-export const initialCounter = 5; // seconds
+export const initialCounter = 2; // seconds
 
 export const initialGame: Game = {
-  activeTeam: "teamName1",
+  activePlayer: {
+    name: "teamName1_playerName1",
+  },
+  activePlayerIndex: 0,
+  activeTeam: {
+    name: "teamName1",
+    players: [
+      {
+        name: "teamName1_playerName1",
+      },
+    ],
+  },
+  activeTeamIndex: 0,
+  activeTurn: 1,
   deck: initialDeck,
   round: 1,
   savedCards: [],
@@ -36,13 +49,18 @@ export const initialGame: Game = {
     teamName2: 0,
     teamName3: 0,
   },
-  nextTeams: ["teamName2", "teamName3", "teamName1"], // teamName1 is currently playing, teamName2 is next
   teams: [
     {
       name: "teamName1",
       players: [
         {
-          name: "playerName1",
+          name: "teamName1_playerName1",
+        },
+        {
+          name: "teamName1_playerName2",
+        },
+        {
+          name: "teamName1_playerName3",
         },
       ],
     },
@@ -50,7 +68,13 @@ export const initialGame: Game = {
       name: "teamName2",
       players: [
         {
-          name: "playerName2",
+          name: "teamName2_playerName1",
+        },
+        {
+          name: "teamName2_playerName2",
+        },
+        {
+          name: "teamName2_playerName3",
         },
       ],
     },
@@ -58,7 +82,13 @@ export const initialGame: Game = {
       name: "teamName3",
       players: [
         {
-          name: "playerName3",
+          name: "teamName3_playerName1",
+        },
+        {
+          name: "teamName3_playerName2",
+        },
+        {
+          name: "teamName3_playerName3",
         },
       ],
     },

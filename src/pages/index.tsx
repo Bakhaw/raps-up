@@ -9,11 +9,28 @@ import Scoreboard from "@/components/Scoreboard";
 
 function Home() {
   const currentGame = useContext(GameContext);
-  const { activeTeam, counter, deck, methods, round } = currentGame;
+  const {
+    activePlayer,
+    activePlayerIndex,
+    activeTeam,
+    activeTurn,
+    counter,
+    deck,
+    methods,
+    round,
+    teams,
+  } = currentGame;
 
+  const isRoundEnd =
+    activePlayerIndex === teams.length && activeTurn === teams.length;
   const isDeckEnd = deck.length === 0;
-  const activeCard = deck[0];
   const cardsLeft = deck.length;
+  const activeCard = deck[0];
+
+  function onStartButtonClick() {
+    methods.goToNextTurn();
+    methods.resetCounter();
+  }
 
   console.log(currentGame);
 
@@ -44,22 +61,20 @@ function Home() {
       </div>
 
       <div className="self-center">
-        {isDeckEnd && (
+        {(isDeckEnd || isRoundEnd) && counter === 0 && (
           <Button onClick={methods.goToNextRound}>Manche suivante</Button>
         )}
 
         {!isDeckEnd && counter > 0 && (
           <>
-            <h1>{activeTeam}</h1>
+            <h1>{activeTeam.name}</h1>
+            <h1>{activePlayer.name}</h1>
             <Card chunks={activeCard.chunks} />
           </>
         )}
 
-        {!isDeckEnd && counter === 0 && (
-          <>
-            <h1>Au tour de {activeTeam}</h1>
-            <Button onClick={methods.resetCounter}>Démarrer</Button>
-          </>
+        {!isDeckEnd && !isRoundEnd && counter === 0 && (
+          <Button onClick={onStartButtonClick}>Démarrer</Button>
         )}
       </div>
     </main>
