@@ -21,16 +21,22 @@ function Home() {
     teams,
   } = currentGame;
 
+  const isCounterEnd = counter === 0;
+  const isDeckEnd = deck.length === 0;
   const isRoundEnd =
     activePlayerIndex === teams.length && activeTurn === teams.length;
-  const isDeckEnd = deck.length === 0;
-  const cardsLeft = deck.length;
-  const activeCard = deck[0];
+
+  const showNextRoundButton = (isDeckEnd || isRoundEnd) && isCounterEnd;
+  const showStartButton = !isDeckEnd && !isRoundEnd && isCounterEnd;
+  const showCard = !isDeckEnd && !isCounterEnd;
 
   function onStartButtonClick() {
     methods.goToNextTurn();
     methods.resetCounter();
   }
+
+  const cardsLeft = deck.length;
+  const activeCard = deck[0];
 
   console.log(currentGame);
 
@@ -61,19 +67,19 @@ function Home() {
       </div>
 
       <div className="self-center">
-        {(isDeckEnd || isRoundEnd) && counter === 0 && (
+        {showNextRoundButton && (
           <Button onClick={methods.goToNextRound}>Manche suivante</Button>
         )}
 
-        {!isDeckEnd && counter > 0 && (
-          <>
+        {showCard && (
+          <div>
             <h1>{activeTeam.name}</h1>
             <h1>{activePlayer.name}</h1>
             <Card chunks={activeCard.chunks} />
-          </>
+          </div>
         )}
 
-        {!isDeckEnd && !isRoundEnd && counter === 0 && (
+        {showStartButton && (
           <Button onClick={onStartButtonClick}>Démarrer</Button>
         )}
       </div>

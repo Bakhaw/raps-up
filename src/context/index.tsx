@@ -97,10 +97,6 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
     setCounter(initialCounter);
   }
 
-  function resetCounter() {
-    setCounter(initialCounter);
-  }
-
   function goToNextTurn() {
     const { activePlayerIndex, activeTurn, teams } = currentGame;
     // const isRoundEnd =
@@ -133,15 +129,21 @@ const ContextProvider: React.FC<ContextProviderProps> = ({ children }) => {
     });
   }
 
+  function resetCounter() {
+    setCounter(initialCounter);
+  }
+
   useEffect(() => {
     if (isCounterEnd) return;
+
+    if (isDeckEnd) return setCounter(0);
 
     const interval = setInterval(() => {
       setCounter(counter - 1);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [counter, isCounterEnd]);
+  }, [counter, isCounterEnd, isDeckEnd]);
 
   const contextValue = {
     ...currentGame,
